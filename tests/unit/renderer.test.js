@@ -17,3 +17,11 @@ test('renderer_accepts_newly_released_snakes_and_reuses_their_mesh',()=>{
  for(let i=0;i<10;i++)renderer.render(model.snapshot());assert.equal(engine.scenes[0].meshes.length,before+1);
  renderer.dispose();
 });
+test('food_and_question_bags_are_large_enough_to_read',()=>{
+ const engine=new NullEngine();const levels=[createFlatLevel({pots:[{id:'bag',x:80,y:16,w:10,h:12,outcome:'bonus'}]})];
+ const renderer=createRenderer({canvas:{},levels,engine});renderer.render(new GameModel(levels).snapshot());
+ const food=engine.scenes[0].getMeshByName('food-food').getBoundingInfo().boundingBox;
+ const bag=engine.scenes[0].getMeshByName('pot-bag').getBoundingInfo().boundingBox;
+ assert.ok(food.extendSize.x*2>=16);assert.ok(food.extendSize.y*2>=16);
+ assert.ok(bag.extendSize.x*2>=18);assert.ok(bag.extendSize.y*2>=20);renderer.dispose();
+});

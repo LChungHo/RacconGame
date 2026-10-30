@@ -16,9 +16,9 @@ export function createGameApp({model,input,renderer,audio,scheduler,hud,onError=
  frameId=scheduler.request(frame);safelyPaint();
  return {
   start(){if(disposed)return;resetTime();model.start();safelyPaint();},
-  pause(){if(disposed)return;model.pause();resetTime();safelyPaint();},
+  pause(){if(disposed)return;model.pause();audio.stop?.();resetTime();safelyPaint();},
   resume(){if(disposed)return;model.resume();resetTime();safelyPaint();},
-  restart(){if(disposed)return;model.restart();resetTime();safelyPaint();},
+  restart(){if(disposed)return;model.restart();audio.stop?.();resetTime();safelyPaint();},
   snapshot(){return model.snapshot();},dispose
  };
 }

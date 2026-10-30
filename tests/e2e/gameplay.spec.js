@@ -32,7 +32,7 @@ test('keyboard_route_clears_stage_and_advances',async({page})=>{
   await page.clock.runFor(1100);
  }
  await expect(page.locator('#game-status')).toHaveAttribute('data-phase','running');
- await expect(page.locator('#lives')).toHaveText('3');await expect(page.locator('#stage')).toHaveText('2');
+ await expect(page.locator('#lives')).toHaveText('3');await expect(page.locator('#stage')).toHaveText('2');await expect(page.locator('#food-strip li:visible canvas')).toHaveCount(2);await expect(page.locator('#food-strip li:visible').last()).toHaveAttribute('title','2. 앵두');
 });
 test('cached_page_restore_keeps_single_live_game',async({page})=>{
  await page.clock.install({time:new Date('2026-10-30T00:00:00Z')});await page.clock.pauseAt(new Date('2026-10-30T00:00:01Z'));

@@ -38,9 +38,9 @@ export function createRenderer({canvas,levels,engine}){
    rectangle('ladder-right',{x:l.x+l.w-2,y:l.y,w:2,h:l.h},'#c2ad69',1);
    for(let y=l.y+4;y<l.y+l.h;y+=6)rectangle('ladder-rung',{x:l.x,y,w:l.w,h:1},'#a58e50',1);
   }
-  for(const f of level.foods)sprite('food-'+f.id,f,'food-'+(f.type??level.foodType??'apple'));
+  for(const f of level.foods)sprite('food-'+f.id,{...f,x:f.x-(16-f.w)/2,w:16,h:16},'food-'+(f.type??level.foodType??'apple'));
   for(const h of level.hazards)sprite('hazard-'+h.id,h,'spike');
-  for(const p of level.pots)sprite('pot-'+p.id,p,'bag');
+  for(const p of level.pots)sprite('pot-'+p.id,{...p,x:p.x-(18-p.w)/2,w:18,h:20},'bag');
   for(const e of level.enemies)sprite('enemy-'+e.id,{...e,x:e.x-2,w:e.w+4,h:e.h+4},e.kind??'caterpillar');
   sprite('player',{x:level.spawn.x-4,y:level.spawn.y,w:20,h:20},'idle');
   // Tiny fixed stars make the otherwise empty upper area feel like an arcade screen.

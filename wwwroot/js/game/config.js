@@ -1,1 +1,1 @@
-export const CONFIG = Object.freeze({ width:288,height:224,step:1/60,maxSteps:5,lives:3,moveSpeed:72,jumpSpeed:192,gravity:480,climbSpeed:56,playerWidth:12,playerHeight:16,maxFall:64,bonusPoints:500,transitionSeconds:1 });
+export const CONFIG = Object.freeze({ width:288,height:224,step:1/60,maxSteps:5,lives:3,moveSpeed:72,jumpSpeed:128,gravity:480,climbSpeed:56,playerWidth:12,playerHeight:16,maxFall:64,bonusPoints:500,transitionSeconds:1 });
