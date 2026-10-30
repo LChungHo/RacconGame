@@ -30,5 +30,7 @@ try{
  listen(window,'keydown',event=>{if(event.code==='Enter'&&!event.repeat&&document.activeElement===canvas&&app.snapshot().phase==='ready'){event.preventDefault();start();}});
  listen(window,'blur',()=>app.pause());listen(document,'visibilitychange',()=>{if(document.hidden)app.pause();});
  listen(window,'resize',()=>{try{renderer.resize();renderer.render(app.snapshot());}catch{showError();}});
- listen(window,'pagehide',cleanup);canvas.focus({preventScroll:true});
+ listen(window,'pagehide',event=>{if(event.persisted)app.pause();else cleanup();});
+ listen(window,'pageshow',event=>{if(event.persisted){try{renderer.resize();app.pause();}catch{showError();}}});
+ canvas.focus({preventScroll:true});
 }catch{showError();}

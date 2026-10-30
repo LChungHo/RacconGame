@@ -34,3 +34,23 @@ test('keyboard_route_completes_all_three_stages',async({page})=>{
  await expect(page.locator('#game-status')).toHaveAttribute('data-phase','victory');
  await expect(page.locator('#lives')).toHaveText('3');
 });
+test('cached_page_restore_keeps_single_live_game',async({page})=>{
+ await page.clock.install({time:new Date('2026-10-30T00:00:00Z')});await page.clock.pauseAt(new Date('2026-10-30T00:00:01Z'));
+ await page.addInitScript(()=>{
+  const request=window.requestAnimationFrame.bind(window),cancel=window.cancelAnimationFrame.bind(window),pending=new Set();
+  window.requestAnimationFrame=callback=>{let id;id=request(time=>{pending.delete(id);callback(time);});pending.add(id);return id;};
+  window.cancelAnimationFrame=id=>{pending.delete(id);cancel(id);};
+  window.pendingGameFrames=()=>pending.size;
+ });
+ await page.goto('/');await page.locator('#start').click();await page.clock.runFor(64);
+ expect(await page.evaluate(()=>window.pendingGameFrames())).toBe(1);
+ await page.evaluate(()=>{window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:true}));window.dispatchEvent(new PageTransitionEvent('pageshow',{persisted:true}));});
+ await expect(page.locator('#game-status')).toHaveAttribute('data-phase','paused');
+ expect(await page.evaluate(()=>window.pendingGameFrames())).toBe(1);
+ await page.locator('#game-canvas').focus();await page.keyboard.press('KeyP');await page.keyboard.down('ArrowRight');await page.clock.runFor(600);await page.keyboard.up('ArrowRight');
+ await expect(page.locator('#score')).toHaveText('100');
+ await page.locator('#restart').click();await expect(page.locator('#game-status')).toHaveAttribute('data-phase','ready');await expect(page.locator('#score')).toHaveText('0');
+ expect(await page.evaluate(()=>window.pendingGameFrames())).toBe(1);
+ await page.evaluate(()=>window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:false})));
+ expect(await page.evaluate(()=>window.pendingGameFrames())).toBe(0);
+});
