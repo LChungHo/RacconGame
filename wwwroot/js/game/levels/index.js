@@ -1,8 +1,6 @@
-import level1 from './level-01.js';
+import { buildLevels } from './layouts.js';
 import { CONFIG } from '../config.js';
-import level2 from './level-02.js';
-import level3 from './level-03.js';
-export const levels=[level1,level2,level3];
+export const levels=buildLevels();
 export function validateLevel(level) {
  const errors=[];
  if(!level||typeof level!=='object')return ['level must be an object'];
@@ -23,7 +21,7 @@ export function validateLevel(level) {
     if(typeof item.id!=='string'||!item.id||ids.has(item.id))errors.push(kind+' id');
     ids.add(item.id);
    }
-   if(kind==='foods'&&!positive(item.points))errors.push('food points');
+   if(kind==='foods'&&item.points!==undefined&&!positive(item.points))errors.push('food points');
    if(kind==='pots'&&!['bonus','snake'].includes(item.outcome))errors.push('pot outcome');
    if(kind==='enemies'&&(![item.minX,item.maxX,item.speed].every(Number.isFinite)||item.minX<0||item.minX>item.maxX||item.maxX+item.w>level.width||item.x<item.minX||item.x>item.maxX||item.speed<0||![1,-1].includes(item.direction)))errors.push('enemy patrol');
   }
