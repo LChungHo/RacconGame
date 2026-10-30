@@ -27,7 +27,7 @@ export function createRenderer({canvas,levels,engine}){
  }
  function loadLevel(index){
   for(const mesh of [...scene.meshes])mesh.dispose();nodes.clear();stage=index;
-  const level=levels[index];const colors=['#77c7ad','#c4a0d8','#e6a665'];const accent=colors[index%3];
+  const level=levels[index];const accent='#41c6b6';
   for(const p of level.platforms){
    rectangle('platform',p,'#24493f');
    rectangle('platform-edge',{x:p.x,y:p.y+p.h-2,w:p.w,h:2},accent,1);
@@ -38,11 +38,11 @@ export function createRenderer({canvas,levels,engine}){
    rectangle('ladder-right',{x:l.x+l.w-2,y:l.y,w:2,h:l.h},'#c2ad69',1);
    for(let y=l.y+4;y<l.y+l.h;y+=6)rectangle('ladder-rung',{x:l.x,y,w:l.w,h:1},'#a58e50',1);
   }
-  for(const f of level.foods)sprite('food-'+f.id,f,'food');
+  for(const f of level.foods)sprite('food-'+f.id,f,'food-'+(f.type??level.foodType??'apple'));
   for(const h of level.hazards)sprite('hazard-'+h.id,h,'spike');
-  for(const p of level.pots)sprite('pot-'+p.id,p,'pot');
-  for(const e of level.enemies)sprite('enemy-'+e.id,e,'enemy');
-  sprite('player',{...level.spawn,w:12,h:16},'idle');
+  for(const p of level.pots)sprite('pot-'+p.id,p,'bag');
+  for(const e of level.enemies)sprite('enemy-'+e.id,{...e,x:e.x-2,w:e.w+4,h:e.h+4},e.kind??'caterpillar');
+  sprite('player',{x:level.spawn.x-4,y:level.spawn.y,w:20,h:20},'idle');
   // Tiny fixed stars make the otherwise empty upper area feel like an arcade screen.
   for(const [x,y] of [[19,207],[66,195],[141,212],[213,201],[267,211]])rectangle('star',{x,y,w:1,h:1},'#4a6356',3);
  }
@@ -51,12 +51,14 @@ export function createRenderer({canvas,levels,engine}){
    if(disposed)return;
    if(stage!==state.levelIndex)loadLevel(state.levelIndex);
    const player=nodes.get('player'),p=state.player;
-   player.position.set(p.x+p.w/2,p.y+p.h/2,0);player.scaling.x=p.facing;
+   player.position.set(p.x+p.w/2,p.y+10,0);player.scaling.x=p.facing;
    const gait=Math.floor(p.x/4)%2;
    frame(player,p.mode==='dead'?'dead':p.mode==='climbing'?'climb':p.mode==='airborne'?'jump':p.vx&&gait?'walk':'idle');
    for(const f of levels[stage].foods)nodes.get('food-'+f.id).setEnabled(!state.collectedFoodIds.includes(f.id));
    for(const pot of levels[stage].pots)nodes.get('pot-'+pot.id).setEnabled(!state.openedPotIds.includes(pot.id));
-   for(const e of state.enemies){const mesh=nodes.get('enemy-'+e.id);mesh.position.set(e.x+e.w/2,e.y+e.h/2,0);mesh.scaling.x=e.direction;}
+   const liveEnemies=new Set(state.enemies.map(e=>'enemy-'+e.id));
+   for(const [name,mesh]of nodes)if(name.startsWith('enemy-')&&!liveEnemies.has(name)){mesh.dispose();nodes.delete(name);}
+   for(const e of state.enemies){const name='enemy-'+e.id;const mesh=nodes.get(name)??sprite(name,{...e,x:e.x-2,w:e.w+4,h:e.h+4},e.kind??'caterpillar');mesh.position.set(e.x+e.w/2,e.y+(e.h+4)/2,0);mesh.scaling.x=e.direction;}
    scene.render();
   },
   resize(){if(!disposed)gpu.resize();},

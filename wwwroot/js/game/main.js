@@ -5,6 +5,7 @@ import { createInput } from './input.js';
 import { createAudio } from './audio.js';
 import { createGameApp } from './app.js';
 import { renderHud } from './hud.js';
+import { createScoreStore } from './score-store.js';
 const root=document.querySelector('#game-root'),canvas=root.querySelector('#game-canvas');
 const listeners=[];let app,renderer,input,audio;
 function listen(target,name,handler){target.addEventListener(name,handler);listeners.push(()=>target.removeEventListener(name,handler));}
@@ -18,10 +19,12 @@ function showError(){
 try{
  const config=JSON.parse(document.querySelector('#game-config').textContent);
  if(config.logicalWidth!==288||config.logicalHeight!==224)throw new Error('Invalid board size');
- const model=new GameModel(levels);renderer=createRenderer({canvas,levels});audio=createAudio(window);
+ let storage;try{storage=window.localStorage;}catch{}
+ const scores=createScoreStore(storage);let savedHighScore=scores.read();
+ const model=new GameModel(levels,{highScore:savedHighScore});renderer=createRenderer({canvas,levels});audio=createAudio(window);
  const togglePause=()=>app.snapshot().phase==='paused'?app.resume():app.pause();
  input=createInput({target:window,canvas,onPause:togglePause});
- app=createGameApp({model,input,renderer,audio,scheduler:{request:fn=>requestAnimationFrame(fn),cancel:id=>cancelAnimationFrame(id),now:()=>performance.now()},hud:state=>renderHud(root,state),onError:showError});
+ app=createGameApp({model,input,renderer,audio,scheduler:{request:fn=>requestAnimationFrame(fn),cancel:id=>cancelAnimationFrame(id),now:()=>performance.now()},hud:state=>{renderHud(root,state);if(state.highScore>savedHighScore){scores.save(state.highScore);savedHighScore=state.highScore;}},onError:showError});
  const start=()=>{void audio.unlock();app.start();canvas.focus({preventScroll:true});};
  listen(root.querySelector('#start'),'click',start);
  listen(root.querySelector('#pause'),'click',()=>{togglePause();canvas.focus({preventScroll:true});});
