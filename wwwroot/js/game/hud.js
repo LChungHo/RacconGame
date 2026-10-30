@@ -39,6 +39,9 @@ export function renderHud(root,state) {
  nodes.score.textContent=String(state.score);
  nodes['top-score'].textContent=String(state.highScore??state.score);
  drawScore(nodes['score-display'],state.score);drawScore(nodes['top-score-display'],state.highScore??state.score);
+ while(nodes['life-strip'].children.length<state.lives){
+  const item=document.createElement('li'),canvas=document.createElement('canvas');paintIcon(canvas,nodes.atlas.frames.idle,nodes.atlas);item.append(canvas);nodes['life-strip'].append(item);
+ }
  nodes.lives.textContent=String(state.lives);
  nodes['life-panel'].setAttribute('aria-label','남은 기회 '+state.lives+'번');
  nodes['life-status'].textContent=state.lives===0?'게임 종료':'남은 기회';

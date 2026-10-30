@@ -11,7 +11,7 @@ export class GameModel {
   this.restart();
  }
  restart() {
-  this.state={phase:'ready',levelIndex:0,stageCount:this.levels.length,score:0,highScore:this.bestScore,lives:CONFIG.lives,stageStartScore:0};
+  this.state={phase:'ready',levelIndex:0,stageCount:this.levels.length,score:0,highScore:this.bestScore,lives:CONFIG.lives,stageStartScore:0,extraLivesAwarded:0};
   resetAttempt(this.state,this.levels[0]);
   this.previousPhase=null;this.moveDistance=0;
  }

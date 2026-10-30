@@ -28,3 +28,20 @@ test('raccoon_life_icons_count_three_chances_and_reset_after_game_over',async({p
  await expect(page.locator('#game-status')).toHaveAttribute('data-phase','gameOver');
  await page.locator('#restart').click();await expect(page.locator('#life-strip canvas:visible')).toHaveCount(3);
 });
+test('earned_raccoons_expand_the_life_hud_beyond_three',async({page})=>{
+ await page.goto('/');
+ const counts=await page.evaluate(async()=>{
+  window.dispatchEvent(new PageTransitionEvent('pagehide',{persisted:false}));
+  const [{GameModel},{renderHud}]=await Promise.all([import('/js/game/model.js'),import('/js/game/hud.js')]);
+  const root=document.querySelector('#game-root');
+  for(const id of ['life-strip','food-strip','clear-dancers'])root.querySelector('#'+id).replaceChildren();
+  const level={id:'hud-check',number:1,width:288,height:224,timeLimitSeconds:120,spawn:{x:16,y:16},platforms:[{x:0,y:8,w:288,h:8}],ladders:[],foods:[{id:'near',x:16,y:16,w:8,h:8},{id:'far',x:260,y:16,w:8,h:8}],pots:[],enemies:[],hazards:[]};
+  const model=new GameModel([level]),counts=[],empty={left:false,right:false,up:false,down:false,jumpPressed:false};
+  const paint=()=>{renderHud(root,model.snapshot());counts.push(root.querySelectorAll('#life-strip li:not([hidden])').length);};
+  paint();model.start();model.state.score=29990;model.step(empty,1/60);paint();
+  model.state.score=59990;model.state.collectedFoodIds=[];model.step(empty,1/60);paint();
+  model.state.secondsLeft=1;model.step(empty,1/60);paint();model.restart();paint();
+  return counts;
+ });
+ expect(counts).toEqual([3,4,5,4,3]);
+});

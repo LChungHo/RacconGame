@@ -45,8 +45,12 @@ function die(state,reason) {
 }
 function releaseSnake(state,level,pot) {
  const width=12;
- const x=Math.min(level.width-width,Math.max(0,pot.x+pot.w+8));
- state.enemies.push({id:'snake-'+pot.id,kind:'snake',x,y:pot.y,w:width,h:10,minX:0,maxX:level.width-width,speed:6,direction:1,ageSeconds:0,graceSeconds:.4});
+ const platform=level.platforms.find(p=>p.y+p.h===pot.y&&pot.x>=p.x&&pot.x+pot.w<=p.x+p.w);
+ const left=platform?.x??0,right=platform?platform.x+platform.w-width:level.width-width;
+ const x=Math.min(right,Math.max(left,pot.x+pot.w+8));
+ const span=Math.min(right-left,64+Math.max(0,(level.number??1)-1)*12);
+ const minX=Math.max(left,Math.min(x-span/2,right-span)),maxX=minX+span;
+ state.enemies.push({id:'snake-'+pot.id,kind:'snake',x,y:pot.y,w:width,h:10,minX,maxX,speed:6,direction:1,ageSeconds:0,graceSeconds:.4});
 }
 export function resolveInteractions(state,level) {
  if(state.phase!=='running')return [];
@@ -76,6 +80,8 @@ export function resolveInteractions(state,level) {
   state.phaseSeconds=0;
   events.push({type:'stageClear'});
  }
+ const earned=Math.floor(state.score/CONFIG.extraLifeEvery)-(state.extraLivesAwarded??0);
+ if(earned>0){state.lives+=earned;state.extraLivesAwarded=(state.extraLivesAwarded??0)+earned;}
  return events;
 }
 export function tickSession(state,levels,dt) {

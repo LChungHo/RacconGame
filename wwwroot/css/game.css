@@ -84,7 +84,7 @@ footer{display:flex;justify-content:space-between;font-size:9px;color:#688063;pa
 #food-strip li[hidden]{display:none}
 #food-strip li.is-complete{opacity:1}
 .life-panel{display:flex;align-items:center;gap:12px;padding:5px 6px 12px;color:#a9c8b4;font:10px Consolas,monospace;border-top:1px solid #26392e}
-#life-strip{display:flex;gap:7px;list-style:none;margin:0;padding:0;min-height:32px;align-items:center}
+#life-strip{display:flex;flex-wrap:wrap;gap:7px;list-style:none;margin:0;padding:0;min-height:32px;align-items:center}
 #life-strip li{line-height:0}
 #life-strip li[hidden]{display:none}
 #life-strip canvas{width:32px;height:32px;image-rendering:pixelated}
