@@ -1,0 +1,28 @@
+@model GamePageViewModel
+@using System.Text.Json
+@{
+    var json = JsonSerializer.Serialize(Model, new JsonSerializerOptions(JsonSerializerDefaults.Web));
+}
+<main class="arcade" id="game-root">
+<header class="masthead"><a class="wordmark" href="@Url.Content("~/")"><span class="coin-mark">P</span> 작은 오락실 <span class="edition">ARCADE / 001</span></a><span class="online"><i></i> SINGLE PLAYER</span></header>
+<div class="heading"><div><p class="eyebrow">1982 INSPIRED · A LITTLE ARCADE CLASSIC</p><h1>너구리<span>PONPOKO</span></h1><p class="subtitle">사다리를 오르고, 폴짝 뛰고, 먹거리를 모두 모아보세요.</p></div><div class="edition-seal">ONE MORE<br/><strong>TRY!</strong><span>작은 도전, 큰 재미</span></div></div>
+<section class="cabinet" aria-label="너구리 게임">
+<div class="hud" aria-label="게임 현황">
+<div><span>SCORE</span><strong id="score">0</strong></div>
+<div><span>STAGE</span><strong id="stage">01 / 03</strong></div>
+<div><span>LIVES</span><strong id="lives">3</strong></div>
+<div><span>TIME</span><strong id="time">120</strong></div>
+</div>
+<div class="screen-wrap"><canvas id="game-canvas" width="864" height="672" tabindex="0" aria-label="너구리 게임 화면. 방향키 이동, 스페이스 점프"></canvas>
+<div class="screen-overlay" id="screen-overlay"><span class="overlay-kicker">READY TO PLAY?</span><h2 id="overlay-title">먹거리 탐험을 시작해요</h2><p id="overlay-copy">모든 먹거리를 모으면 다음 스테이지!</p><span class="start-hint">PRESS ENTER OR START</span></div>
+<div id="game-error" role="alert" hidden></div></div>
+<div class="cabinet-bottom"><span id="game-status" role="status" data-phase="ready">시작을 눌러주세요</span><span class="status-mark">● PONPOKO CLUB</span></div>
+</section>
+<div class="controls" aria-label="게임 조작">
+<div class="primary-controls"><button id="start" class="button primary" aria-label="시작">시작 <span aria-hidden="true">↵</span></button><button id="pause" class="button" disabled>일시정지 <span>P</span></button><button id="restart" class="button">다시 시작 <span>↻</span></button></div>
+<button id="mute" class="sound-button" aria-pressed="false" aria-label="음소거">♪ 소리 켜짐</button>
+</div>
+<section class="instructions" aria-label="플레이 방법"><div><span class="instruction-index">01</span><div><h3>가볍게 움직이세요</h3><p>방향키 <kbd>←</kbd> <kbd>→</kbd> 이동 · <kbd>↑</kbd> <kbd>↓</kbd> 사다리</p></div></div><div><span class="instruction-index">02</span><div><h3>위험은 폴짝 넘어요</h3><p><kbd class="wide-key">SPACE</kbd> 점프 · 적과 가시를 조심!</p></div></div><div><span class="instruction-index">03</span><div><h3>모두 모으면 성공</h3><p>먹거리 +100 · 보너스 항아리 +500</p></div></div></section>
+<footer><span>작은 오락실에서 즐기는 너구리의 모험</span><span>INSPIRED BY PONPOKO · ORIGINAL PIXEL ART</span></footer>
+</main>
+<script id="game-config" type="application/json">@Html.Raw(json)</script>

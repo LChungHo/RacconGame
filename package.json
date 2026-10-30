@@ -1,0 +1,22 @@
+{
+  "name": "ponpoko-raccoon",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.22.0 <25"
+  },
+  "scripts": {
+    "build": "node scripts/build-client.mjs",
+    "test:unit": "node --test \"tests/unit/*.test.js\"",
+    "test:e2e": "npm run build && playwright test",
+    "test": "npm run test:unit && npm run test:e2e"
+  },
+  "dependencies": {
+    "@babylonjs/core": "9.33.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "esbuild": "0.28.2"
+  }
+}
