@@ -11,6 +11,7 @@ export function resetAttempt(state,level) {
  state.foodName=level.foodName??'먹거리';
  state.phaseSeconds=0;
  state.deathReason=null;
+ state.clearSummary=null;
  state.player={...level.spawn,w:CONFIG.playerWidth,h:CONFIG.playerHeight,vx:0,vy:0,facing:1,mode:'grounded',supportY:level.spawn.y,fallStartY:level.spawn.y};
  state.enemies=structuredClone(level.enemies);
  state.collectedFoodIds=[];
@@ -68,7 +69,9 @@ export function resolveInteractions(state,level) {
   else {state.score+=pot.points??CONFIG.bonusPoints;events.push({type:'bonus'});}
  }
  if(state.collectedFoodIds.length===level.foods.length) {
-  state.score+=Math.floor(Math.max(0,state.secondsLeft))*10;
+  const timeBonus=Math.floor(Math.max(0,state.secondsLeft))*10;
+  state.clearSummary={stageNumber:state.levelIndex+1,stageScore:state.score-state.stageStartScore,timeBonus,totalScore:state.score+timeBonus};
+  state.score+=timeBonus;
   state.phase='stageClear';
   state.phaseSeconds=0;
   events.push({type:'stageClear'});
@@ -82,7 +85,7 @@ export function tickSession(state,levels,dt) {
   state.player.vy-=CONFIG.gravity*dt;
   state.player.y+=state.player.vy*dt;
  }
- if(state.phaseSeconds+1e-9<CONFIG.transitionSeconds)return [];
+ if(state.phaseSeconds+1e-9<(state.phase==='stageClear'?CONFIG.clearSeconds:CONFIG.transitionSeconds))return [];
  if(state.phase==='dying') {
   if(state.lives===0){state.phase='gameOver';return [];}
   state.score=state.stageStartScore;

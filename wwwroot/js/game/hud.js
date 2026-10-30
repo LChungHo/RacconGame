@@ -20,8 +20,9 @@ function paintIcon(canvas,frame,atlas) {
  canvas.getContext('2d').putImageData(new ImageData(data,frame.w,frame.h),0,0);
 }
 function initialize(root) {
- const nodes={};for(const id of ['score','top-score','score-display','top-score-display','stage','stage-label','lives','time','time-fill','food-strip','life-strip','life-panel','life-status','game-status','start','pause','screen-overlay','overlay-title','overlay-copy'])nodes[id]=root.querySelector('#'+id);
- const atlas=createSpriteAtlas();
+ const nodes={};for(const id of ['score','top-score','score-display','top-score-display','stage','stage-label','lives','time','time-fill','food-strip','life-strip','life-panel','life-status','game-status','start','pause','screen-overlay','overlay-title','overlay-copy','clear-celebration','clear-title','clear-stage-score','clear-bonus','clear-total','clear-dancers','clear-next'])nodes[id]=root.querySelector('#'+id);
+ const atlas=createSpriteAtlas();nodes.atlas=atlas;
+ nodes.dancers=Array.from({length:5},()=>{const canvas=document.createElement('canvas');nodes['clear-dancers'].append(canvas);return canvas;});
  for(const [index,food]of STAGE_FOODS.entries()) {
   const item=document.createElement('li'),canvas=document.createElement('canvas');
   item.title=(index+1)+'. '+food.name;
@@ -63,6 +64,17 @@ export function renderHud(root,state) {
  nodes.start.disabled=state.phase!=='ready';
  nodes.pause.disabled=!['running','paused','dying','stageClear'].includes(state.phase);
  nodes.pause.textContent=state.phase==='paused'?'계속하기 · P':'일시정지 · P';
- nodes['screen-overlay'].hidden=state.phase==='running';
+ nodes['screen-overlay'].hidden=['running','stageClear','gameOver','victory'].includes(state.phase);
+ nodes['clear-celebration'].hidden=state.phase!=='stageClear';
+ if(state.phase==='stageClear'&&state.clearSummary){
+  nodes['clear-next'].textContent=state.levelIndex===state.stageCount-1?'잠시 후 최종 기록을 남겨보세요!':'잠시 후 다음 스테이지로!';
+  const summary=state.clearSummary,beat=Math.floor(state.phaseSeconds*6);
+  nodes['clear-title'].textContent=summary.stageNumber+' 스테이지 클리어!';
+  nodes['clear-stage-score'].textContent=String(summary.stageScore);nodes['clear-bonus'].textContent=String(summary.timeBonus);nodes['clear-total'].textContent=String(summary.totalScore);
+  if(nodes.danceBeat!==beat){
+   nodes.danceBeat=beat;
+   nodes.dancers.forEach((canvas,index)=>{const pose=(beat+index)%4;paintIcon(canvas,nodes.atlas.frames[['idle','walk','jump','walk'][pose]],nodes.atlas);canvas.style.transform='translateY('+((beat+index)%2?-6:2)+'px) rotate('+((beat+index)%2?-9:9)+'deg) scaleX('+(index%2?-1:1)+')';});
+  }
+ }else nodes.danceBeat=null;
  nodes['overlay-title'].textContent=title;nodes['overlay-copy'].textContent=copy;nodes.kicker.textContent=kicker;nodes.hint.hidden=state.phase!=='ready';
 }

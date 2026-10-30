@@ -53,6 +53,31 @@ footer{display:flex;justify-content:space-between;font-size:9px;color:#688063;pa
 #food-strip{margin-left:37px}
 @media(max-width:600px){.stage-clock-row{grid-template-columns:28px minmax(0,1fr)}#food-strip{margin-left:29px}}
 
+
+/* Stage history begins on the right; DOM order remains chronological. */
+#food-strip{flex-direction:row-reverse}
+.clear-celebration,.result-panel{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;text-align:center;background:#020705f5;padding:clamp(14px,3vw,30px);overflow:auto}
+.clear-celebration[hidden],.result-panel[hidden]{display:none}
+.celebration-kicker{font:10px Consolas,monospace;letter-spacing:3px;color:#71d5c3;margin:0 0 14px}
+.clear-celebration{justify-content:center;background:radial-gradient(ellipse at center,#243320,#030705 75%)}
+.clear-celebration h2,.result-panel h2{font:700 clamp(18px,3vw,28px) Consolas,"Malgun Gothic",monospace;color:#e3f68d;letter-spacing:1px;margin:0 0 16px}
+.clear-scores{width:min(100%,320px);margin:0;display:grid;gap:10px;font:14px Consolas,"Malgun Gothic",monospace}
+.clear-scores>div{display:flex;justify-content:space-between;gap:20px}.clear-scores dt{color:#bcc8aa}.clear-scores dd{margin:0;color:#61d5c5;font-weight:700}
+.clear-scores .clear-grand-total{border-top:1px solid #68734b;padding-top:12px;margin-top:3px;font-size:20px}
+.clear-grand-total dd{color:#f9d77d}
+#clear-dancers{display:flex;gap:clamp(4px,2vw,18px);align-items:center;justify-content:center;width:100%;margin:34px 0 14px}
+#clear-dancers canvas{width:clamp(36px,7vw,72px);height:auto;image-rendering:pixelated;transform-origin:bottom center}
+.clear-next,.result-tip{color:#a8bb96;font-size:11px;margin:8px 0 0}
+.final-score-label{font-size:12px;color:#afc6ae;margin:0 0 16px}.final-score-label strong{display:block;font:bold 26px Consolas,monospace;color:#69d6c6;margin-top:6px}
+#score-form{width:min(100%,360px);text-align:left}#score-form label{display:block;color:#bfccb1;font-size:11px;margin-bottom:6px}
+.name-entry{display:flex;gap:8px}#player-name{width:0;min-width:0;flex:1;font:14px "Malgun Gothic",sans-serif;background:#0e1b15;border:1px solid #667657;border-radius:4px;color:#f1edda;padding:10px}
+#player-name:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.result-receipt{font:bold 18px Consolas,"Malgun Gothic",sans-serif;color:#f9d77d;margin:12px 0 0;overflow-wrap:anywhere}
+#result-message{font-size:11px;color:#b7cfb3;max-width:400px;min-height:16px;margin:8px 0}
+.leaderboard{width:min(100%,400px);overflow:auto;min-height:70px;flex:1}.leaderboard table{border-collapse:collapse;width:100%;font:12px Consolas,"Malgun Gothic",sans-serif}
+.leaderboard caption{color:#d6f386;font:bold 12px Consolas,monospace;padding:8px;letter-spacing:1px}.leaderboard th{color:#8caa94;font-size:10px}.leaderboard th,.leaderboard td{padding:7px 8px;border-bottom:1px solid #28392b}.leaderboard td:last-child{color:#63d3c2}
+@media(max-width:600px){.clear-scores{font-size:12px;gap:7px}.clear-scores .clear-grand-total{font-size:17px}#clear-dancers{margin:22px 0 8px}.celebration-kicker{font-size:8px;margin-bottom:8px;letter-spacing:2px}.result-panel h2{margin-bottom:7px}.final-score-label{margin-bottom:8px;font-size:10px}.final-score-label strong{font-size:22px;margin:3px}.result-receipt{font-size:15px;margin-top:7px}.leaderboard th,.leaderboard td{padding:5px}.result-tip{font-size:9px}#score-form label{font-size:10px}.result-panel{padding:12px}#result-message{font-size:10px;margin:5px 0}}
+
 /* Cumulative stage markers and three visible raccoon chances. */
 #food-strip{display:flex;flex-wrap:wrap;justify-content:flex-start;gap:2px;min-height:36px;align-items:flex-end}
 #food-strip li{flex:0 0 32px;width:32px}

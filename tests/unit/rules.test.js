@@ -49,6 +49,6 @@ test('retry_restores_checkpoint_and_food_chain',()=>{const m=model({enemies:[ene
 test('clear_bonus_uses_remaining_timer_and_advances_to_victory',()=>{
  const levels=[0,1,2].map(n=>createFlatLevel({id:'level'+n,foods:[food]}));const m=new GameModel(levels);m.start();m.state.secondsLeft=12.9;
  const events=m.step(emptyInput(),1/60);assert.equal(m.snapshot().score,130);assert.equal(events.filter(e=>e.type==='stageClear').length,1);
- for(let l=0;l<3;l++){for(let i=0;i<60;i++)m.step(emptyInput(),1/60);if(l<2){assert.equal(m.snapshot().levelIndex,l+1);m.step(emptyInput(),1/60);}}assert.equal(m.snapshot().phase,'victory');
+ for(let l=0;l<3;l++){for(let i=0;i<300;i++)m.step(emptyInput(),1/60);if(l<2){assert.equal(m.snapshot().levelIndex,l+1);m.step(emptyInput(),1/60);}}assert.equal(m.snapshot().phase,'victory');
 });
 test('pause_preserves_transition_timer',()=>{const m=model({foods:[food]});m.step(emptyInput(),1/60);m.step(emptyInput(),.5);m.pause();m.step(emptyInput(),10);m.resume();assert.equal(m.snapshot().phase,'stageClear');assert.equal(m.snapshot().phaseSeconds,.5);});

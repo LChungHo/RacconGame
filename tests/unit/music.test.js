@@ -16,3 +16,8 @@ test('stage_clear_plays_a_short_multi_note_melody_and_mute_stops_it',async()=>{
  assert.ok(notes.length>=4);assert.ok(new Set(notes.map(n=>n.frequency)).size>=3);assert.ok(notes.at(-1).start-notes[0].start>=.5);
  audio.setMuted(true);assert.ok(notes.every(note=>note.stop===undefined));const count=notes.length;audio.play({type:'move'});assert.equal(notes.length,count);audio.dispose();
 });
+
+test('clear_music_lasts_through_the_raccoon_dance',async()=>{
+ const {notes,Context}=recordingContext();const audio=createAudio({AudioContext:Context});await audio.unlock();audio.play({type:'stageClear'});
+ assert.ok(Math.max(...notes.map(n=>n.stop))-notes[0].start>=4,'celebration needs a full dance melody');audio.dispose();
+});

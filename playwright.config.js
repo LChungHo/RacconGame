@@ -10,6 +10,6 @@ export default defineConfig({
   cwd:published?fileURLToPath(new URL('./artifacts/publish',import.meta.url)):undefined,
   command:published?'dotnet RaccoonGame.dll --urls http://127.0.0.1:5081 --Game:PathBase=/ponpoko':'dotnet run --project RaccoonGame.csproj --no-launch-profile --urls http://127.0.0.1:5080',
   url:published?'http://127.0.0.1:5081/ponpoko/':'http://127.0.0.1:5080',reuseExistingServer:false,timeout:60000,
-  env:{ASPNETCORE_ENVIRONMENT:published?'Production':'Development',DOTNET_NOLOGO:'1'}
+  env:{ASPNETCORE_ENVIRONMENT:published?'Production':'Development',DOTNET_NOLOGO:'1',Leaderboard__DatabasePath:fileURLToPath(new URL('./artifacts/test-data/leaderboard-'+process.pid+'-'+Date.now()+'.db',import.meta.url))}
  }
 });

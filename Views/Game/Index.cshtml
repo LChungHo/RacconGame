@@ -14,6 +14,18 @@
 </header>
 <div class="screen-wrap"><canvas id="game-canvas" width="864" height="672" tabindex="0" aria-label="너구리 게임 화면. 방향키 이동, 스페이스 점프"></canvas>
 <div class="screen-overlay" id="screen-overlay"><span class="overlay-kicker">READY TO PLAY?</span><h2 id="overlay-title">먹거리 탐험을 시작해요</h2><p id="overlay-copy">모든 먹거리를 모으면 다음 스테이지!</p><span class="start-hint">PRESS ENTER OR START</span></div>
+<section id="clear-celebration" class="clear-celebration" aria-labelledby="clear-title" hidden>
+<p class="celebration-kicker">PONPOKO · STAGE CLEAR</p><h2 id="clear-title">스테이지 클리어!</h2>
+<dl class="clear-scores"><div><dt>획득 점수</dt><dd id="clear-stage-score">0</dd></div><div><dt>시간 보너스</dt><dd id="clear-bonus">0</dd></div><div class="clear-grand-total"><dt>TOTAL SCORE</dt><dd id="clear-total">0</dd></div></dl>
+<div id="clear-dancers" aria-label="다섯 마리 너구리가 함께 춤을 춥니다"></div>
+<p class="clear-next" id="clear-next">잠시 후 다음 스테이지로!</p></section>
+<section id="result-panel" class="result-panel" aria-labelledby="result-title" hidden>
+<p class="celebration-kicker">SHARED HIGH SCORES</p><h2 id="result-title">GAME OVER</h2>
+<p class="final-score-label">나의 최종 점수 <strong id="final-score">0점</strong></p>
+<form id="score-form">@Html.AntiForgeryToken()<label for="player-name">순위에 남길 이름</label><div class="name-entry"><input id="player-name" name="playerName" maxlength="12" required autocomplete="nickname" placeholder="이름 (1~12자)"/><button id="save-score" class="button primary" type="submit">기록 저장</button></div></form>
+<p id="result-receipt" class="result-receipt" role="status"></p><p id="result-message" role="status"></p>
+<div class="leaderboard"><table><caption>전체 플레이어 TOP 10</caption><thead><tr><th scope="col">순위</th><th scope="col">이름</th><th scope="col">점수</th></tr></thead><tbody id="leaderboard-body"></tbody></table></div>
+<p class="result-tip">다시 시작 버튼으로 새 게임을 시작하세요.</p></section>
 <div id="game-error" role="alert" hidden></div></div>
 <div class="cabinet-bottom"><span id="game-status" role="status" data-phase="ready">시작을 눌러주세요</span><span class="arcade-meta"><span id="stage-label">1 / 20 · 당근</span></span></div>
 <div class="life-panel" id="life-panel" role="img" aria-label="남은 기회 3번"><span id="life-status">남은 기회</span><ol id="life-strip"></ol><strong id="lives" class="sr-only">3</strong></div>

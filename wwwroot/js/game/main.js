@@ -5,11 +5,12 @@ import { createInput } from './input.js';
 import { createAudio } from './audio.js';
 import { createGameApp } from './app.js';
 import { renderHud } from './hud.js';
+import { createResults } from './results.js';
 import { createScoreStore } from './score-store.js';
 const root=document.querySelector('#game-root'),canvas=root.querySelector('#game-canvas');
-const listeners=[];let app,renderer,input,audio;
+const listeners=[];let app,renderer,input,audio,results;
 function listen(target,name,handler){target.addEventListener(name,handler);listeners.push(()=>target.removeEventListener(name,handler));}
-function cleanup(){listeners.splice(0).forEach(remove=>remove());if(app)app.dispose();else{input?.dispose();audio?.dispose();renderer?.dispose();}}
+function cleanup(){results?.dispose();listeners.splice(0).forEach(remove=>remove());if(app)app.dispose();else{input?.dispose();audio?.dispose();renderer?.dispose();}}
 function showError(){
  cleanup();const message=root.querySelector('#game-error');message.hidden=false;
  message.textContent='그래픽을 시작할 수 없습니다. WebGL을 지원하는 브라우저에서 다시 시도해 주세요.';
@@ -24,7 +25,8 @@ try{
  const model=new GameModel(levels,{highScore:savedHighScore});renderer=createRenderer({canvas,levels});audio=createAudio(window);
  const togglePause=()=>app.snapshot().phase==='paused'?app.resume():app.pause();
  input=createInput({target:window,canvas,onPause:togglePause});
- app=createGameApp({model,input,renderer,audio,scheduler:{request:fn=>requestAnimationFrame(fn),cancel:id=>cancelAnimationFrame(id),now:()=>performance.now()},hud:state=>{renderHud(root,state);if(state.highScore>savedHighScore){scores.save(state.highScore);savedHighScore=state.highScore;}},onError:showError});
+ results=createResults({root,assetBaseUrl:config.assetBaseUrl});
+ app=createGameApp({model,input,renderer,audio,scheduler:{request:fn=>requestAnimationFrame(fn),cancel:id=>cancelAnimationFrame(id),now:()=>performance.now()},hud:state=>{renderHud(root,state);results.render(state);if(state.highScore>savedHighScore){scores.save(state.highScore);savedHighScore=state.highScore;}},onError:showError});
  const start=()=>{void audio.unlock();app.start();canvas.focus({preventScroll:true});};
  listen(root.querySelector('#start'),'click',start);
  listen(root.querySelector('#pause'),'click',()=>{togglePause();canvas.focus({preventScroll:true});});

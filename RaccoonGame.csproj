@@ -2,6 +2,9 @@
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework><Nullable>enable</Nullable><ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.14" />
+  </ItemGroup>
   <Target Name="RequireClientBundle" BeforeTargets="ComputeFilesToPublish">
     <Error Condition="!Exists('wwwroot/dist/game.js')" Text="Client bundle missing. Run npm ci and npm run build before publishing." />
   </Target>

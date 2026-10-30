@@ -29,10 +29,18 @@ test('keyboard_route_clears_stage_and_advances',async({page})=>{
    await page.clock.runFor(duration);
   }
   for(const code of held)await page.keyboard.up(code);held.clear();
-  await page.clock.runFor(1100);
+  await expect(page.locator('#clear-celebration')).toBeVisible();
+  await expect(page.locator('#clear-dancers canvas')).toHaveCount(5);
+  await expect(page.locator('#clear-total')).toHaveText(await page.locator('#score').textContent());
+  const dancer=page.locator('#clear-dancers canvas').first(),pose=await dancer.getAttribute('style');
+  await page.clock.runFor(250);expect(await dancer.getAttribute('style')).not.toBe(pose);
+  await page.screenshot({path:'artifacts/stage-clear-dance.png',fullPage:true});
+  await page.clock.runFor(5100);
  }
  await expect(page.locator('#game-status')).toHaveAttribute('data-phase','running');
  await expect(page.locator('#lives')).toHaveText('3');await expect(page.locator('#stage')).toHaveText('2');await expect(page.locator('#food-strip li:visible canvas')).toHaveCount(2);await expect(page.locator('#food-strip li:visible').last()).toHaveAttribute('title','2. 앵두');
+ const carrot=await page.locator('#food-strip li').nth(0).boundingBox(),cherry=await page.locator('#food-strip li').nth(1).boundingBox();
+ expect(carrot.x).toBeGreaterThan(cherry.x);
 });
 test('cached_page_restore_keeps_single_live_game',async({page})=>{
  await page.clock.install({time:new Date('2026-10-30T00:00:00Z')});await page.clock.pauseAt(new Date('2026-10-30T00:00:01Z'));

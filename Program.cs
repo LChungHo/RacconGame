@@ -1,5 +1,9 @@
+using RaccoonGame.Services;
+
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
+builder.Services.AddAntiforgery(options => options.HeaderName = "X-CSRF-TOKEN");
+builder.Services.AddSingleton<LeaderboardService>();
 var app = builder.Build();
 var pathBase = builder.Configuration["Game:PathBase"];
 if (!string.IsNullOrEmpty(pathBase)) app.UsePathBase(pathBase);

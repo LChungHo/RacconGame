@@ -21,3 +21,35 @@ test('published_app_does_not_serve_source_checkout_files',async({request})=>{
  try{const response=await request.get('http://127.0.0.1:5081/ponpoko/'+name);expect(response.status()).toBe(404);}
  finally{await unlink(file);}
 });
+import {spawn} from 'node:child_process';
+import {mkdir} from 'node:fs/promises';
+import {fileURLToPath} from 'node:url';
+test('published_rankings_survive_restart_and_storage_failure_is_recoverable',async({playwright})=>{
+ test.setTimeout(60000);
+ const cwd=fileURLToPath(new URL('../../artifacts/publish',import.meta.url));
+ const dataDir=fileURLToPath(new URL('../../artifacts/test-data',import.meta.url));await mkdir(dataDir,{recursive:true});
+ const database=dataDir+'/restart-'+randomUUID()+'.db',base='http://127.0.0.1:5082/ponpoko/';
+ let process;
+ const request=await playwright.request.newContext({baseURL:base});
+ async function start(databasePath){
+  process=spawn('dotnet',['RaccoonGame.dll','--urls','http://127.0.0.1:5082','--Game:PathBase=/ponpoko'],{cwd,env:{...globalThis.process.env,ASPNETCORE_ENVIRONMENT:'Production',Leaderboard__DatabasePath:databasePath},stdio:'ignore',windowsHide:true});
+  await expect.poll(async()=>{try{return(await request.get(base)).status();}catch{return 0;}},{timeout:20000}).toBe(200);
+ }
+ async function stop(){if(!process||process.exitCode!==null)return;const stopped=new Promise(resolve=>process.once('exit',resolve));process.kill();await stopped;}
+ async function submit(name){
+  const page=await request.get(base),html=await page.text();
+  const token=html.match(/name="__RequestVerificationToken"[^>]*value="([^"]+)"/)?.[1];expect(token).toBeTruthy();
+  return request.post(base+'api/leaderboard',{headers:{'X-CSRF-TOKEN':token},data:{runId:randomUUID(),name,score:12340}});
+ }
+ try{
+  await start(database);expect((await submit('영구보관')).status()).toBe(200);await stop();
+  await start(database);
+  const response=await request.get(base+'api/leaderboard');expect(response.status()).toBe(200);
+  expect((await response.json()).leaders).toEqual([expect.objectContaining({name:'영구보관',score:12340,rank:1})]);
+  expect((await request.get(base+'App_Data/leaderboard.db')).status()).toBe(404);await stop();
+  await start(dataDir);
+  expect((await request.get(base)).status()).toBe(200);
+  expect((await request.get(base+'api/leaderboard')).status()).toBe(503);
+  expect((await submit('권한실패')).status()).toBe(503);
+ }finally{await stop();await request.dispose();}
+});

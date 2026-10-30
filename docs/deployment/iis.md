@@ -36,14 +36,14 @@ npm ci → 클라이언트 빌드 → dotnet restore → Release publish 순으�
 - wwwroot/dist/game.js와 정적 CSS
 - 운영 서버는 Node.js와 npm, 외부 CDN 연결이 필요하지 않습니다.
 
-사용자 생성 데이터는 없지만 이전 배포의 설정과 로그를 덮어쓰지 않도록 먼저 백업합니다. 기존 게시 폴더의 잔여 파일이 남는 문제를 피하려면 검증된 새 버전 폴더를 준비하고 사이트 물리 경로를 전환합니다. 배포 스크립트는 파일 삭제·서버 복사·사이트 전환을 수행하지 않습니다.
+순위 기록은 아래의 영구 데이터 경로에 별도 보관합니다. 또한 이전 배포의 설정과 로그를 덮어쓰지 않도록 먼저 백업합니다. 기존 게시 폴더의 잔여 파일이 남는 문제를 피하려면 검증된 새 버전 폴더를 준비하고 사이트 물리 경로를 전환합니다. 배포 스크립트는 파일 삭제·서버 복사·사이트 전환을 수행하지 않습니다.
 
 ## IIS 구성
 
 1. 대상 서버에 IIS와 .NET 10 Hosting Bundle 및 ASP.NET Core Module을 확인합니다.
 2. 별도 앱 풀을 만들고 .NET CLR 버전은 **No Managed Code**로 둡니다. 게시된 web.config의 in-process 설정과 실행 비트 수를 확인합니다.
 3. 사이트의 물리 경로를 게시 폴더로 설정합니다. 하위 경로이면 단순 가상 디렉터리가 아닌 IIS 애플리케이션으로 등록하고 별도 앱 풀을 사용합니다.
-4. 앱 풀 계정에는 게시 폴더 읽기/실행 권한만 부여합니다. 필요할 때 로그 전용 폴더에만 쓰기 권한을 추가합니다.
+4. 앱 풀 계정에는 게시 폴더 읽기/실행 권한만 부여합니다. 순위 DB 전용 폴더와 필요한 로그 폴더에는 앱 풀 계정의 수정 권한을 추가합니다. DB 폴더에는 SQLite 저널 파일을 만들 수 있어야 합니다.
 5. 운영 환경은 Production으로 설정하고 HTTPS 바인딩과 인증서를 구성합니다. 비밀값은 서버 환경변수 등 외부 설정으로 관리합니다.
 6. web.config를 삭제하거나 배포 스크립트에서 임의로 덮어쓰지 않습니다.
 
@@ -83,3 +83,17 @@ try {
 - [ASP.NET Core 앱을 IIS로 게시](https://learn.microsoft.com/en-us/aspnet/core/tutorials/publish-to-iis?view=aspnetcore-10.0)
 - [Windows IIS 호스팅](https://learn.microsoft.com/en-us/aspnet/core/host-and-deploy/iis/?view=aspnetcore-10.0)
 - [.NET 지원 정책](https://dotnet.microsoft.com/en-us/platform/support/policy)
+
+## 공유 순위 DB
+
+이름·최종 점수·순위는 Microsoft.Data.Sqlite 10.0.14로 서버에 저장합니다. 기본 경로는 앱 콘텐츠 루트의 App_Data/leaderboard.db입니다. 파일과 저널은 wwwroot 밖에 두며 Git에 포함하지 않습니다. 별도 DB 서버는 필요하지 않습니다.
+
+운영에서는 버전별 배포 폴더 밖의 고정 경로를 권장합니다. 서버 환경변수 Leaderboard__DatabasePath(구성 키 Leaderboard:DatabasePath)를 예를 들어 D:\\GameData\\Ponpoko\\leaderboard.db로 설정합니다. 앱 풀 계정에는 **이 데이터 폴더의 수정 권한**을 부여합니다. 공개 wwwroot 전체에 쓰기 권한을 주지 않습니다. 해당 디스크의 DB를 모든 요청 프로세스가 같이 사용하며, 여러 서버를 각각 별도 DB로 운영하는 구성은 이 버전의 범위가 아닙니다.
+
+DB는 첫 조회/저장 때 생성합니다. 경로/권한 오류가 나도 게임 페이지와 플레이는 열리며 순위 조회·저장은 503과 재시도 안내를 반환합니다. 배포 교체·앱 풀 재시작·백업 복구 시 같은 영구 경로를 유지하세요. 백업은 앱을 정지한 뒤 DB와 SQLite 저널 관련 파일을 함께 보존하거나 SQLite의 일관된 백업 기능을 사용합니다.
+
+게임 종료 또는 20스테이지 완주 뒤 이름(1~12자)을 입력하면 상위 10명과 본인 점수·전체 순위를 표시합니다. 동점은 공동 순위(1,1,3)이고 같은 판의 재시도는 한 번만 기록합니다. 서버는 입력 검증과 CSRF 검증을 수행합니다. 점수는 브라우저가 계산해 전송하며, 서버에서 플레이 과정을 재검증하는 부정행위 방지 기능은 포함하지 않습니다.
+
+검증 시에는 테스트 전용 DB 경로를 사용해 실제 미리보기 기록과 분리합니다. 실제 IIS 배포 후에는 다른 브라우저의 순위 공유, 앱 풀 재시작 후 기록 유지, 쓰기 권한과 하위 애플리케이션 경로를 확인해야 합니다.
+
+참고: [Microsoft.Data.Sqlite 패키지](https://www.nuget.org/packages/Microsoft.Data.Sqlite/10.0.14), [SQLite 트랜잭션](https://learn.microsoft.com/en-us/dotnet/standard/data/sqlite/transactions).

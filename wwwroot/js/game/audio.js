@@ -29,7 +29,8 @@ export function createAudio(window) {
     if(event.type==='jump')tone(260,0,.12,.035,680);
     else if(event.type==='move')tone(footstep++%2?220:180,0,.025,.012);
     else if(event.type==='stageClear'||event.type==='victory'){
-     const melody=[[523,0,.10],[659,.11,.10],[784,.22,.12],[1047,.36,.22],[1319,.62,.10],[1047,.76,.19]];
+     const tune=[523,659,784,1047,784,659,698,880,1047,1397,1047,880,784,988,1175,1568,1319,1175,1047,784,659,784,1047];
+     const melody=tune.map((frequency,index)=>[frequency,index*.19,index===tune.length-1?.43:.14]);
      for(const [frequency,offset,duration]of melody)tone(frequency,offset,duration,.032);
     } else {
      const frequency={food:659,bonus:880,death:110}[event.type];
