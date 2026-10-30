@@ -31,3 +31,12 @@ test('twenty_stages_follow_requested_food_order_and_fixed_bag_patterns',()=>{
  });
  assert.equal(shapes.size,20);
 });
+test('authored_ladder_landings_allow_a_normal_hold_then_horizontal_exit',()=>{
+ for(const level of levels){
+  const model=new GameModel([level]);model.start();const startX=level.ladders[0].x;model.state.player.x=startX;
+  for(let tick=0;tick<60;tick++)model.step({left:false,right:false,up:true,down:false,jumpPressed:false},1/60);
+  model.step({left:false,right:true,up:false,down:false,jumpPressed:false},1/60);
+  assert.equal(model.snapshot().player.y,64,level.id);assert.equal(model.snapshot().player.mode,'grounded',level.id);
+  assert.ok(model.snapshot().player.x>startX,level.id);
+ }
+});

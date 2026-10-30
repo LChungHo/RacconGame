@@ -27,7 +27,7 @@ export function buildLevels() {
   ];
   const platforms=[16,64,112].flatMap((y,i)=>platformRow(y,lowerGaps[i]));
   platforms.push(...platformRow(160,topGap?[topGap]:[]));
-  const ladders=[16,64,112].flatMap(y=>[{x:left,y,w:12,h:48},{x:right,y,w:12,h:48}]);
+  const ladders=[16,64,112].flatMap((y,row)=>[{x:left+[0,12,4][row],y,w:12,h:48},{x:right+[0,-12,4][row],y,w:12,h:48}]);
   const foods=[16,64,112,160].flatMap(y=>[48,64,200].map(x=>({id:'food-'+y+'-'+x,x,y,w:8,h:8,type:food.id})));
   const bonusCount=[3,9].includes(number)?1:[4,12,13].includes(number)?3:2;
   const bonusIndices=Array.from({length:bonusCount},(_,i)=>(index+i*2+i%2)%4);
