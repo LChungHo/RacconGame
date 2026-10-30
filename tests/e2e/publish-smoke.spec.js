@@ -11,3 +11,13 @@ test('published_assets_work_under_pathbase',async({page})=>{
  expect(bundleResponses).toEqual([200]);expect(failedRequests).toEqual([]);expect(externalRequests).toEqual([]);expect(pageErrors).toEqual([]);
  expect(localPaths.length).toBeGreaterThanOrEqual(3);expect(localPaths.every(p=>p.startsWith('/ponpoko/'))).toBe(true);
 });
+
+import { writeFile,unlink } from 'node:fs/promises';
+import { randomUUID } from 'node:crypto';
+test('published_app_does_not_serve_source_checkout_files',async({request})=>{
+ const name='source-only-'+randomUUID()+'.txt';
+ const file=new URL('../../wwwroot/'+name,import.meta.url);
+ await writeFile(file,'source checkout sentinel');
+ try{const response=await request.get('http://127.0.0.1:5081/ponpoko/'+name);expect(response.status()).toBe(404);}
+ finally{await unlink(file);}
+});
