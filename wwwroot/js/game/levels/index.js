@@ -1,6 +1,8 @@
 import level1 from './level-01.js';
 import { CONFIG } from '../config.js';
-export const levels=[level1];
+import level2 from './level-02.js';
+import level3 from './level-03.js';
+export const levels=[level1,level2,level3];
 export function validateLevel(level) {
  const errors=[];
  if(!level||typeof level!=='object')return ['level must be an object'];
