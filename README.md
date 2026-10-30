@@ -1,4 +1,4 @@
-# 너구리 · Ponpoko Arcade
+# RacconGame · 너구리 (Ponpoko Arcade)
 
 ASP.NET Core MVC와 Babylon.js로 만든 1인용 브라우저 게임입니다. 폰포코를 참고한 20개의 고정 스테이지와 자체 도트 그래픽·효과음을 사용합니다. 원작 ROM과 맵 좌표를 복제한 버전은 아닙니다.
 
