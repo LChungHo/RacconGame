@@ -1,3 +1,4 @@
+import { stepPlayer } from './movement.js';
 import { CONFIG } from './config.js';
 import { validateLevel } from './levels/index.js';
 export class GameModel {
@@ -17,5 +18,5 @@ export class GameModel {
  pause(){if(['running','dying','stageClear'].includes(this.state.phase)){this.previousPhase=this.state.phase;this.state.phase='paused';}}
  resume(){if(this.state.phase==='paused'&&this.previousPhase){this.state.phase=this.previousPhase;this.previousPhase=null;}}
  snapshot(){return structuredClone(this.state);}
- step(input,dt){return [];}
+ step(input,dt){if(this.state.phase==='running')stepPlayer(this.state.player,input,this.levels[this.state.levelIndex],dt);return [];}
 }

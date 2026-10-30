@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { stepPlayer } from '../../wwwroot/js/game/movement.js';
+import { createFlatLevel,emptyInput,makePlayer } from '../helpers/fixtures.js';
+const dt=1/60;
+test('grounded_moves_72_pixels_in_one_second',()=>{const p=makePlayer();for(let i=0;i<60;i++)stepPlayer(p,{...emptyInput(),right:true},createFlatLevel(),dt);assert.ok(Math.abs(p.x-88)<1e-6);assert.equal(p.y,16);});
+test('jump_requires_new_press',()=>{const p=makePlayer();stepPlayer(p,{...emptyInput(),jumpPressed:true},createFlatLevel(),dt);assert.ok(p.y>16);const vy=p.vy;stepPlayer(p,{...emptyInput(),jumpPressed:true},createFlatLevel(),dt);assert.ok(p.vy<vy);});
+test('swept_landing_does_not_tunnel',()=>{const p=makePlayer({y:30,vy:-500,mode:'airborne',fallStartY:64});stepPlayer(p,emptyInput(),createFlatLevel(),.05);assert.equal(p.y,16);assert.equal(p.vy,0);assert.equal(p.mode,'grounded');assert.equal(p.fallStartY,64);});
+test('ladder_requires_overlap_and_exits_at_ends',()=>{const l=createFlatLevel({platforms:[{x:0,y:8,w:288,h:8},{x:0,y:56,w:288,h:8}],ladders:[{x:16,y:16,w:12,h:48}]});const p=makePlayer();for(let i=0;i<60;i++)stepPlayer(p,{...emptyInput(),up:true},l,dt);assert.equal(p.y,64);assert.equal(p.mode,'grounded');for(let i=0;i<60;i++)stepPlayer(p,{...emptyInput(),down:true},l,dt);assert.equal(p.y,16);assert.equal(p.mode,'grounded');const far=makePlayer({x:40});stepPlayer(far,{...emptyInput(),up:true},l,dt);assert.equal(far.y,16);const mid=makePlayer({y:30,mode:'climbing'});stepPlayer(mid,{...emptyInput(),up:true,down:true},l,dt);assert.equal(mid.y,30);});
+test('edges_and_opposite_keys',()=>{const p=makePlayer();stepPlayer(p,{...emptyInput(),left:true,right:true},createFlatLevel(),dt);assert.equal(p.vx,0);p.x=275;stepPlayer(p,{...emptyInput(),right:true},createFlatLevel(),dt);assert.equal(p.x,276);const edge=makePlayer({x:23});stepPlayer(edge,{...emptyInput(),right:true},createFlatLevel({platforms:[{x:0,y:8,w:24,h:8}]}),dt);assert.equal(edge.mode,'airborne');});
